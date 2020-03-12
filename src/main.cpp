@@ -1,6 +1,6 @@
 #include <iostream>
 
-int main()
+auto main() noexcept -> int
 {
     std::cout << "Hello world!" << std::endl;
 }
