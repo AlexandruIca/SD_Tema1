@@ -34,3 +34,23 @@ NEW_SORT("BubbleSort", input, output)
         }
     } while(!sorted);
 }
+
+NEW_SORT("InsertionSort", input, output)
+{
+    if(input.empty()) {
+        return;
+    }
+
+    output.reserve(input.size());
+    output.push_back(input[0]);
+
+    for(int i = 1; i < input.size(); ++i) {
+        output.push_back(input[i]);
+
+        int j = i - 1;
+        while(j >= 0 && output[j] > input[i]) {
+            std::swap(output[j], output[j + 1]);
+            --j;
+        }
+    }
+}
