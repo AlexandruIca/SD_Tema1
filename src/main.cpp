@@ -1,6 +1,19 @@
-#include <iostream>
+#include <cstddef>
 
-auto main() noexcept -> int
+#include "sort_helper.hpp"
+
+NEW_SORT("Countsort", input, output)
 {
-    std::cout << "Hello world!" << std::endl;
+    std::vector<int> frecv(find_max(input), 0);
+    output.reserve(input.size());
+
+    for(auto const elem : input) {
+        ++frecv[elem];
+    }
+
+    for(int i = 0; i < input.size(); ++i) {
+        for(int j = 0; j < frecv[i]; ++j) {
+            output.push_back(i);
+        }
+    }
 }
