@@ -17,7 +17,8 @@
 #include <utility>
 #include <vector>
 
-auto operator<<(std::ostream& os, std::vector<int> const& v) -> std::ostream&
+template<typename T>
+auto operator<<(std::ostream& os, std::vector<T> const& v) -> std::ostream&
 {
     os << '[';
     if(v.size() >= 1) {
@@ -388,6 +389,31 @@ auto make_generator(sort_type const type,
     }
 }
 
+auto split(std::string const& str, std::string const& pattern)
+    -> std::vector<std::string>
+{
+    std::size_t pos_start = 0;
+    std::size_t pos_end;
+    std::size_t delim_len = pattern.length();
+    std::string token;
+    std::vector<std::string> res;
+
+    while((pos_end = str.find(pattern, pos_start)) != std::string::npos) {
+        token = str.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        if(!token.empty()) {
+            res.push_back(token);
+        }
+    }
+
+    auto s = str.substr(pos_start);
+
+    if(!s.empty()) {
+        res.push_back(s);
+    }
+    return res;
+}
+
 [[nodiscard]] auto check_input(std::string const& config_path,
                                std::map<std::string, config> const& config)
     -> std::vector<std::tuple<sort_type, int, int>>
@@ -397,15 +423,21 @@ auto make_generator(sort_type const type,
     std::string line{};
 
     while(std::getline(f, line)) {
-        std::string sort_type;
+        sort_type type;
         int array_size{ 0 };
         int biggest_num{ 0 };
         std::stringstream ss;
 
-        ss << line;
-        ss >> sort_type >> array_size >> biggest_num;
+        auto words = split(line, " ");
+        auto [sort_name, cfg] = *config.find(
+            std::string{ config_path.begin(), config_path.end() - 4 });
+        type = to_sort_type(words[0]);
 
-        for(auto const& [sort_name, cfg] : config) {
+        std::cout << "------" << sort_name << std::endl;
+
+        if(words.size() > 1) {
+            array_size = std::stoi(words[1]);
+
             if(array_size > cfg.max_array_size()) {
                 std::cout << sort_name
                           << " array size too large: " << array_size
@@ -413,6 +445,10 @@ auto make_generator(sort_type const type,
                 std::cout << "Max: " << cfg.max_array_size() << std::endl;
                 throw "array_size too large";
             }
+        }
+        if(words.size() > 2) {
+            biggest_num = std::stoi(words[2]);
+
             if(biggest_num > cfg.max_biggest_number()) {
                 std::cout << sort_name
                           << " does not accept numbers larger than "
@@ -422,7 +458,7 @@ auto make_generator(sort_type const type,
             }
         }
 
-        params.emplace_back(to_sort_type(sort_type), array_size, biggest_num);
+        params.emplace_back(type, array_size, biggest_num);
     }
 
     return params;
@@ -434,7 +470,8 @@ auto main() noexcept -> int
 
     sort_config.emplace(
         std::make_pair("CountSort", config{ 10'000'000, 1'000'000 }));
-    sort_config.emplace(std::make_pair("BubbleSort", config{}));
+    sort_config.emplace(std::make_pair(
+        "BubbleSort", config{ 7000, std::numeric_limits<int>::max() }));
     sort_config.emplace(std::make_pair("InsertionSort", config{}));
     sort_config.emplace(std::make_pair("RadixSort10", config{}));
     sort_config.emplace(std::make_pair("MergeSort", config{}));
@@ -442,26 +479,27 @@ auto main() noexcept -> int
     sort_config.emplace(std::make_pair("QuickSort", config{}));
     sort_config.emplace(std::make_pair("QuickSort2", config{}));
 
-    std::vector<std::tuple<sort_type, int, int>> params{};
-
-    try {
-        using namespace std::string_literals;
-        params = check_input("sort_config.txt"s, sort_config);
-    }
-    catch(char const* text) {
-        std::cout << "Error: " << text << std::endl;
-    }
+    std::cout << get_tests() << std::endl;
 
     for(auto& test : get_tests()) {
-        for(auto const [sort_type, array_size, biggest_num] : params) {
-            std::cout << "Sort_type: " << static_cast<int>(sort_type)
-                      << std::endl;
+        std::vector<std::tuple<sort_type, int, int>> params{};
+
+        try {
+            using namespace std::string_literals;
+            params = check_input(test->name() + ".txt"s, sort_config);
+        }
+        catch(char const* text) {
+            std::cout << "Error: " << text << std::endl;
+        }
+
+        for(auto const [type, array_size, biggest_num] : params) {
+            std::cout << "Sort_type: " << static_cast<int>(type) << std::endl;
             std::cout << "Array_size: " << array_size << std::endl;
             std::cout << "Biggest_num: " << biggest_num << std::endl;
             std::vector<int> input;
             std::vector<int> output;
 
-            make_generator(sort_type, array_size, biggest_num)->generate(input);
+            make_generator(type, array_size, biggest_num)->generate(input);
             test->benchmark(input, output);
         }
     }

@@ -17,3 +17,20 @@ NEW_SORT("CountSort", input, output)
         }
     }
 }
+
+NEW_SORT("BubbleSort", input, output)
+{
+    output =
+        input; // array_size for bubble sort is not big, we can afford to copy
+    bool sorted{ true };
+
+    do {
+        sorted = true;
+        for(int i = 1; i < output.size(); ++i) {
+            if(output[i] < output[i - 1]) {
+                std::swap(output[i], output[i - 1]);
+                sorted = false;
+            }
+        }
+    } while(!sorted);
+}
