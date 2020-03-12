@@ -3,14 +3,35 @@
 #pragma once
 
 #include <algorithm>
+#include <chrono>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <map>
+#include <memory>
 #include <random>
+#include <sstream>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
+
+auto operator<<(std::ostream& os, std::vector<int> const& v) -> std::ostream&
+{
+    os << '[';
+    if(v.size() >= 1) {
+        os << v.front();
+
+        if(v.size() >= 2) {
+            for(int i = 1; i < v.size(); ++i) {
+                os << ", " << v[i];
+            }
+        }
+    }
+    os << ']';
+    return os;
+}
 
 class sort;
 
@@ -39,8 +60,32 @@ public:
     virtual auto do_sort(std::vector<int> const& input,
                          std::vector<int>& output) -> void = 0;
 
-    auto benchmark() -> void
+    auto benchmark(std::vector<int>& input, std::vector<int>& output) -> void
     {
+        using namespace std::chrono;
+        auto start = high_resolution_clock::now();
+        this->do_sort(input, output);
+        auto end = high_resolution_clock::now();
+
+        auto sort_duration = duration_cast<milliseconds>(end - start).count();
+
+        auto start_std = high_resolution_clock::now();
+        std::sort(input.begin(), input.end());
+        auto end_std = high_resolution_clock::now();
+
+        auto std_sort_duration =
+            duration_cast<milliseconds>(end_std - start_std).count();
+
+        if(input != output) {
+            std::cout << m_name << " did not sort correctly!" << std::endl;
+            std::cout << "Expected:\n" << input << std::endl;
+            std::cout << "Got:\n" << output << std::endl;
+            return;
+        }
+
+        std::cout << m_name << " took " << sort_duration << "ms" << std::endl;
+        std::cout << "std::sort took " << std_sort_duration << "ms"
+                  << std::endl;
     }
 
     [[nodiscard]] inline auto name() const noexcept -> std::string const&
@@ -79,21 +124,12 @@ public:
 // NEW_SORT("Countsort", input, output) {
 //      std::vector<int> frecv(find_max(input), 0);
 //      output.reserve(input.size());
-//
-//      for(int const elem : input) {
-//          ++frecv[elem];
-//      }
-//
-//      for(int i = 0; i < static_cast<int>(input.size()); ++i) {
-//          for(int j = 0; j < frecv[i]; ++j) {
-//              output.push_back(i);
-//          }
-//      }
+//      // sort...
 // }
 
 auto find_max(std::vector<int> const& v) -> int
 {
-    int max{ std::numeric_limits<int>::min() };
+    int max{ 0 };
 
     for(int const elem : v) {
         if(elem > max) {
@@ -143,16 +179,14 @@ protected:
     sort_generator() noexcept = default;
     sort_generator(int const array_size, int const max_biggest_number) noexcept
         : m_array_size{ array_size }
-        , m_biggest_number{ max_biggest_number }
+        , m_biggest_number{ max_biggest_number - 1 }
     {
         m_rng.seed(m_rd());
-        m_dist.param(std::uniform_int_distribution<int>::param_type{
-            0, m_biggest_number - 1 });
     }
 
-    static auto rnd()
+    auto rnd()
     {
-        return m_dist(m_rng);
+        return m_dist(m_rng) % m_biggest_number;
     }
 
 public:
@@ -163,7 +197,9 @@ public:
 
 std::mt19937_64 sort_generator::m_rng{};
 std::random_device sort_generator::m_rd{};
-std::uniform_int_distribution<int> sort_generator::m_dist{};
+std::uniform_int_distribution<int> sort_generator::m_dist{
+    0, std::numeric_limits<int>::max()
+};
 
 class empty_generator final : public sort_generator
 {
@@ -199,8 +235,8 @@ public:
         v.resize(m_array_size);
 
         if(m_repeat) {
-            std::generate(v.begin(), v.end(), [x = 0]() mutable {
-                return (rnd() % 2 == 0) ? x++ : x;
+            std::generate(v.begin(), v.end(), [this, x = 0]() mutable {
+                return (this->rnd() % 2 == 0) ? x++ : x;
             });
         }
         else {
@@ -267,92 +303,168 @@ public:
     auto generate(std::vector<int>& v) -> void override
     {
         v.resize(m_array_size);
-        std::generate(v.begin(), v.end(), []() { return rnd(); });
+        std::generate(v.begin(), v.end(), [this]() { return this->rnd(); });
         std::shuffle(v.begin(), v.end(), m_rng);
     }
 };
 
-auto operator<<(std::ostream& os, std::vector<int> const& v) -> std::ostream&
+enum class sort_type
 {
-    os << '[';
-    if(v.size() >= 1) {
-        os << v.front();
+    empty = 0,
+    sorted,
+    sorted_repeat,
+    reversed,
+    reversed_repeat,
+    shuffled,
+    shuffled_repeat,
+    random
+};
 
-        if(v.size() >= 2) {
-            for(int i = 1; i < v.size(); ++i) {
-                os << ", " << v[i];
+auto to_lower(std::string const& str) -> std::string
+{
+    std::string result;
+
+    for(char const ch : str) {
+        result.push_back(std::tolower(ch));
+    }
+
+    return result;
+}
+
+auto to_sort_type(std::string const& str) -> sort_type
+{
+    if(to_lower(str) == "empty") {
+        return sort_type::empty;
+    }
+    else if(to_lower(str) == "sorted") {
+        return sort_type::sorted;
+    }
+    else if(to_lower(str) == "sorted_rep") {
+        return sort_type::sorted_repeat;
+    }
+    else if(to_lower(str) == "reversed") {
+        return sort_type::reversed;
+    }
+    else if(to_lower(str) == "reversed_rep") {
+        return sort_type::reversed_repeat;
+    }
+    else if(to_lower(str) == "shuffled") {
+        return sort_type::shuffled;
+    }
+    else if(to_lower(str) == "shuffled_rep") {
+        return sort_type::shuffled_repeat;
+    }
+    else if(to_lower(str) == "random") {
+        return sort_type::random;
+    }
+    else {
+        throw "Unknown sort type!";
+    }
+}
+
+auto make_generator(sort_type const type,
+                    int const array_size,
+                    int const biggest_num) -> std::unique_ptr<sort_generator>
+{
+    switch(type) {
+    case sort_type::empty:
+        return std::make_unique<empty_generator>();
+    case sort_type::sorted:
+        return std::make_unique<sorted_generator>(array_size);
+    case sort_type::sorted_repeat:
+        return std::make_unique<sorted_generator>(array_size, true);
+    case sort_type::reversed:
+        return std::make_unique<reversed_generator>(array_size);
+    case sort_type::reversed_repeat:
+        return std::make_unique<reversed_generator>(array_size, true);
+    case sort_type::shuffled:
+        return std::make_unique<shuffled_generator>(array_size);
+    case sort_type::shuffled_repeat:
+        return std::make_unique<shuffled_generator>(array_size, true);
+    case sort_type::random:
+        return std::make_unique<shuffled_generator>(array_size, biggest_num);
+    default:
+        throw "Unknown sort type given!";
+    }
+}
+
+[[nodiscard]] auto check_input(std::string const& config_path,
+                               std::map<std::string, config> const& config)
+    -> std::vector<std::tuple<sort_type, int, int>>
+{
+    std::vector<std::tuple<sort_type, int, int>> params;
+    std::ifstream f{ config_path };
+    std::string line{};
+
+    while(std::getline(f, line)) {
+        std::string sort_type;
+        int array_size{ 0 };
+        int biggest_num{ 0 };
+        std::stringstream ss;
+
+        ss << line;
+        ss >> sort_type >> array_size >> biggest_num;
+
+        for(auto const& [sort_name, cfg] : config) {
+            if(array_size > cfg.max_array_size()) {
+                std::cout << sort_name
+                          << " array size too large: " << array_size
+                          << std::endl;
+                std::cout << "Max: " << cfg.max_array_size() << std::endl;
+                throw "array_size too large";
+            }
+            if(biggest_num > cfg.max_biggest_number()) {
+                std::cout << sort_name
+                          << " does not accept numbers larger than "
+                          << cfg.max_biggest_number() << std::endl;
+                std::cout << "Given: " << biggest_num << std::endl;
+                throw "biggest_num too large";
             }
         }
+
+        params.emplace_back(to_sort_type(sort_type), array_size, biggest_num);
     }
-    os << ']';
-    return os;
+
+    return params;
 }
 
 auto main() noexcept -> int
 {
-    std::vector<int> v;
-    {
-        empty_generator g{};
-        g.generate(v);
-        std::cout << "Empty: " << v << std::endl;
-    }
-    v.clear();
-    {
-        sorted_generator g{ 100 };
-        g.generate(v);
-        std::cout << "Sorted:\n" << v << std::endl;
-    }
-    v.clear();
-    {
-        sorted_generator g{ 100, true };
-        g.generate(v);
-        std::cout << "Sorted(repeat):\n" << v << std::endl;
-    }
-    v.clear();
-    {
-        reversed_generator g{ 100 };
-        g.generate(v);
-        std::cout << "Reversed:\n" << v << std::endl;
-    }
-    v.clear();
-    {
-        reversed_generator g{ 100, true };
-        g.generate(v);
-        std::cout << "Reversed(repeat):\n" << v << std::endl;
-    }
-    v.clear();
-    {
-        shuffled_generator g{ 100 };
-        g.generate(v);
-        std::cout << "Shuffled:\n" << v << std::endl;
-    }
-    v.clear();
-    {
-        shuffled_generator g{ 100, true };
-        g.generate(v);
-        std::cout << "Shuffled(repeat):\n" << v << std::endl;
-    }
-    v.clear();
-    {
-        random_generator g{ 100, 100000 };
-        g.generate(v);
-        std::cout << "Random:\n" << v << std::endl;
-    }
-    /*
     std::map<std::string, config> sort_config{};
 
     sort_config.emplace(
-        std::make_pair("CountSort", config{ 10'000'00, 1'000'000 }));
+        std::make_pair("CountSort", config{ 10'000'000, 1'000'000 }));
+    sort_config.emplace(std::make_pair("BubbleSort", config{}));
+    sort_config.emplace(std::make_pair("InsertionSort", config{}));
+    sort_config.emplace(std::make_pair("RadixSort10", config{}));
+    sort_config.emplace(std::make_pair("MergeSort", config{}));
+    sort_config.emplace(std::make_pair("MergeSort2", config{}));
+    sort_config.emplace(std::make_pair("QuickSort", config{}));
+    sort_config.emplace(std::make_pair("QuickSort2", config{}));
 
-    std::ifstream input_config{ "sort_config.txt" };
+    std::vector<std::tuple<sort_type, int, int>> params{};
 
-    std::vector<int> out;
+    try {
+        using namespace std::string_literals;
+        params = check_input("sort_config.txt"s, sort_config);
+    }
+    catch(char const* text) {
+        std::cout << "Error: " << text << std::endl;
+    }
 
     for(auto& test : get_tests()) {
-        test->do_sort({ 1, 2, 3, 4 }, out);
-        std::cout << test->name() << std::endl;
-        out.clear();
-    }*/
+        for(auto const [sort_type, array_size, biggest_num] : params) {
+            std::cout << "Sort_type: " << static_cast<int>(sort_type)
+                      << std::endl;
+            std::cout << "Array_size: " << array_size << std::endl;
+            std::cout << "Biggest_num: " << biggest_num << std::endl;
+            std::vector<int> input;
+            std::vector<int> output;
+
+            make_generator(sort_type, array_size, biggest_num)->generate(input);
+            test->benchmark(input, output);
+        }
+    }
 }
 
 #endif // !SORT_HELPER_HPP

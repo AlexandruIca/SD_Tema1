@@ -1,0 +1,11 @@
+random        100         100
+shuffled      5000
+sorted        1000
+sorted_rep    1000
+reversed      10000
+reversed_rep  10000
+empty
+random        10000       1000
+shuffled      100000
+random        10000000    1000000
+shuffled_rep  10000000    1000000
