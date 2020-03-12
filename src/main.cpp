@@ -2,7 +2,7 @@
 
 #include "sort_helper.hpp"
 
-NEW_SORT("Countsort", input, output)
+NEW_SORT("CountSort", input, output)
 {
     std::vector<int> frecv(find_max(input), 0);
     output.reserve(input.size());
