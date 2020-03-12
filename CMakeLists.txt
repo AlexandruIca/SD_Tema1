@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(Sortari LANGUAGES CXX)
+project(Sortari)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/StandardProjectSettings.cmake)
 
 add_library(project_options INTERFACE)
