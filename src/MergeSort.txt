@@ -1,0 +1,11 @@
+random        7000000        999999999
+shuffled      1570000
+sorted        1462000
+sorted_rep    1562000
+reversed      1562000
+reversed_rep  1562000
+empty
+random        1500000        999999999
+shuffled      1500000
+random        1543000        999999999
+shuffled_rep  654000         999999999

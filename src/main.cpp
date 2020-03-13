@@ -90,3 +90,62 @@ NEW_SORT("RadixSort2", input, output)
 {
     radix_sort<2>(output);
 }
+
+auto merge(std::vector<int>& buf,
+           std::vector<int>& v,
+           int const left,
+           int const mid,
+           int const right) -> void
+{
+    int i{ left };
+    int j{ mid + 1 };
+    int index{ left };
+
+    while(i <= mid && j <= right) {
+        if(buf[j] < buf[i]) {
+            v[index++] = buf[j++];
+        }
+        else {
+            v[index++] = buf[i++];
+        }
+    }
+
+    while(i <= mid) {
+        v[index++] = buf[i++];
+    }
+    while(j <= right) {
+        v[index++] = buf[j++];
+    }
+
+    for(int k = left; k < index; ++k) {
+        buf[k] = v[k];
+    }
+}
+
+auto merge_sort(std::vector<int>& buf,
+                std::vector<int>& v,
+                int const left,
+                int const right) -> void
+{
+    if(right - left <= 0) {
+        return;
+    }
+    if(right - left == 1) {
+        if(buf[left] > buf[right]) {
+            return std::swap(buf[left], buf[right]);
+        }
+
+        return;
+    }
+
+    int const mid = left + (right - left) / 2;
+    merge_sort(buf, v, left, mid);
+    merge_sort(buf, v, mid + 1, right);
+    merge(buf, v, left, mid, right);
+}
+
+NEW_SORT("MergeSort", input, output)
+{
+    std::vector<int> buf = input;
+    merge_sort(buf, output, 0, input.size() - 1);
+}

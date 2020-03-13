@@ -556,8 +556,8 @@ auto main() noexcept -> int
         std::make_pair("RadixSort10", config{ 10'000'000, 10'000'000 }));
     sort_config.emplace(
         std::make_pair("RadixSort2", config{ 10'000'000, 10'000'000 }));
-    sort_config.emplace(std::make_pair("MergeSort", config{}));
-    sort_config.emplace(std::make_pair("MergeSort2", config{}));
+    sort_config.emplace(std::make_pair(
+        "MergeSort", config{ 10'000'000, std::numeric_limits<int>::max() }));
     sort_config.emplace(std::make_pair("QuickSort", config{}));
     sort_config.emplace(std::make_pair("QuickSort2", config{}));
 
