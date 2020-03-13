@@ -560,6 +560,8 @@ auto main() noexcept -> int
         "MergeSort", config{ 10'000'000, std::numeric_limits<int>::max() }));
     sort_config.emplace(std::make_pair(
         "QuickSort", config{ 10'000'000, std::numeric_limits<int>::max() }));
+    sort_config.emplace(std::make_pair(
+        "QuickSortSTL", config{ 10'000'000, std::numeric_limits<int>::max() }));
 
     for(auto& test : get_tests()) {
         std::vector<std::tuple<sort_type, int, int>> params{};

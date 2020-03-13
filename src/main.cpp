@@ -1,5 +1,6 @@
 #include <array>
 #include <cstddef>
+#include <iterator>
 #include <queue>
 
 #include "sort_helper.hpp"
@@ -208,4 +209,44 @@ auto quicksort(std::vector<int>& v, int const left, int const right) -> void
 NEW_SORT("QuickSort", input, output)
 {
     quicksort(output, 0, input.size() - 1);
+}
+
+template<typename InputIt>
+auto median_of_threeSTL(InputIt first, InputIt last) -> InputIt
+{
+    InputIt mid = first;
+    std::advance(mid, std::distance(first, last) / 2);
+
+    if(*last < *first) {
+        std::swap(*last, *first);
+    }
+    if(*mid < *first) {
+        std::swap(*mid, *first);
+    }
+    if(*last < *mid) {
+        std::swap(*last, *mid);
+    }
+
+    return mid;
+}
+
+template<typename InputIt>
+auto quicksortSTL(InputIt first, InputIt last) -> void
+{
+    if(first == last) {
+        return;
+    }
+
+    auto pivot = *median_of_threeSTL(first, last);
+    InputIt middle1 = std::partition(
+        first, last, [pivot](int const& elem) { return elem < pivot; });
+    InputIt middle2 = std::partition(
+        middle1, last, [pivot](int const& elem) { return !(pivot < elem); });
+    quicksortSTL(first, middle1);
+    quicksortSTL(middle2, last);
+}
+
+NEW_SORT("QuickSortSTL", input, output)
+{
+    quicksortSTL(output.begin(), output.end());
 }
