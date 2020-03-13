@@ -3,7 +3,7 @@
 ## Ce am implementat
 - [x] CountSort
 - [x] BubbleSort
-- [x] InsertionSort(partial)
+- [x] InsertionSort
 - [ ] RadixSort
 - [ ] MergeSort
 - [ ] QuickSort
