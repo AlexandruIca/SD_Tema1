@@ -10,10 +10,11 @@
 
 ## Structura
 
-Sortarile sunt implementate in src/main.cpp.
+Sortarile sunt implementate in [src/main.cpp](https://github.com/AlexandruIca/SD_Tema1/blob/master/src/main.cpp).
 
-Fiecare sortare are un input(fisierele src/\*.txt). Primul cuvant de pe fiecare
-linie reprezinta cum sunt generate numerele pentru a fi sortate:
+Fiecare sortare are un input(fisierele [src/\*.txt](https://github.com/AlexandruIca/SD_Tema1/tree/master/src)).
+Primul cuvant de pe fiecare linie reprezinta cum sunt generate numerele pentru
+a fi sortate:
 * random SIZE MAX -> genereaza SIZE numere random in intervalul [0, MAX)
 * shuffled SIZE -> genereaza [0, 1, 2, ..., SIZE - 1] dupa care le amesteca
 * shuffled\_rep SIZE -> la fel ca shuffled dar numerele se pot repeta
@@ -23,8 +24,9 @@ linie reprezinta cum sunt generate numerele pentru a fi sortate:
 * reversed\_rep SIZE -> la fel ca reversed dar numerele se pot repeta
 * empty -> testeaza pentru []
 
-In src/sort\_helper.hpp este codul care face mai usoara implementarea unei noi
-sortari si afiseaza rezultate aranjate in tabele.
+In [src/sort\_helper.hpp](https://github.com/AlexandruIca/SD_Tema1/blob/master/src/sort_helper.hpp)
+este codul care face mai usoara implementarea unei noi sortari si afiseaza
+rezultate aranjate in tabele.
 
 ## Rulare
 
