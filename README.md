@@ -40,4 +40,8 @@ cd src/
 
 ## Demo
 
-![Could not load PNG :(](media/SortariOutput.png)
+![Could not load PNG :(](media/CountSort.png)
+![Could not load PNG :(](media/BubbleSort_InsertionSort.png)
+![Could not load PNG :(](media/InsertionSortSTL_RadixSort10.png)
+![Could not load PNG :(](media/RadixSort2_MergeSort.png)
+![Could not load PNG :(](media/QuickSort.png)
