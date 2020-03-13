@@ -5,23 +5,21 @@
 NEW_SORT("CountSort", input, output)
 {
     std::vector<int> frecv(find_max(input) + 1, 0);
-    output.reserve(input.size());
 
     for(auto const elem : input) {
         ++frecv[elem];
     }
 
+    int index{ 0 };
     for(int i = 0; i < frecv.size(); ++i) {
         for(int j = 0; j < frecv[i]; ++j) {
-            output.push_back(i);
+            output[index++] = i;
         }
     }
 }
 
 NEW_SORT("BubbleSort", input, output)
 {
-    output =
-        input; // array_size for bubble sort is not big, we can afford to copy
     bool sorted{ true };
 
     do {
@@ -41,16 +39,18 @@ NEW_SORT("InsertionSort", input, output)
         return;
     }
 
-    output.reserve(input.size());
-    output.push_back(input[0]);
-
-    for(int i = 1; i < input.size(); ++i) {
-        output.push_back(input[i]);
-
+    for(int i = 1; i < output.size(); ++i) {
         int j = i - 1;
-        while(j >= 0 && output[j] > input[i]) {
+        while(j >= 0 && output[j] > output[j + 1]) {
             std::swap(output[j], output[j + 1]);
             --j;
         }
+    }
+}
+
+NEW_SORT("InsertionSortSTL", input, output)
+{
+    for(auto it = output.begin(); it != output.end(); ++it) {
+        std::rotate(std::upper_bound(output.begin(), it, *it), it, it + 1);
     }
 }

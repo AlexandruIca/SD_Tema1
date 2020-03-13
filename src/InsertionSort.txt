@@ -5,7 +5,7 @@ sorted_rep    16620
 reversed      16620
 reversed_rep  16620
 empty
-random        15             10000000
+random        15              10000000
 shuffled      15
-random        6430           10000000
-shuffled_rep  7540           10000000
+random        14300           10000000
+shuffled_rep  15400           10000000

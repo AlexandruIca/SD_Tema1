@@ -176,8 +176,9 @@ public:
     };                                                                         \
     static RAND(sort__) RAND(sort_tmp_var__);                                  \
                                                                                \
-    auto RAND(sort__)::do_sort(std::vector<int> const& input_name,             \
-                               std::vector<int>& output_name)                  \
+    auto RAND(sort__)::do_sort(                                                \
+        [[maybe_unused]] std::vector<int> const& input_name,                   \
+        std::vector<int>& output_name)                                         \
         ->void
 
 // Use like this:
@@ -548,6 +549,9 @@ auto main() noexcept -> int
         "BubbleSort", config{ 7'000, std::numeric_limits<int>::max() }));
     sort_config.emplace(std::make_pair(
         "InsertionSort", config{ 20'000, std::numeric_limits<int>::max() }));
+    sort_config.emplace(
+        std::make_pair("InsertionSortSTL",
+                       config{ 100'000, std::numeric_limits<int>::max() }));
     sort_config.emplace(std::make_pair("RadixSort10", config{}));
     sort_config.emplace(std::make_pair("MergeSort", config{}));
     sort_config.emplace(std::make_pair("MergeSort2", config{}));
