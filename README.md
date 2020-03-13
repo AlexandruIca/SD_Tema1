@@ -31,7 +31,7 @@ sortari si afiseaza rezultate aranjate in tabele.
 TODO: adauga o versiune in care totul e inclus intr-un .cpp.
 
 ```sh
-cmake -Bbuild .
+cmake -Bbuild -DCMAKE_BUILD_TYPE=Release .
 cd build
 cmake --build .
 cd src/
