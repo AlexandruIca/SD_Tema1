@@ -5,7 +5,7 @@
 - [x] BubbleSort
 - [x] InsertionSort
 - [x] RadixSort
-- [ ] MergeSort
+- [x] MergeSort
 - [ ] QuickSort
 
 ## Structura
