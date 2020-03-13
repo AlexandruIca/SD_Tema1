@@ -34,6 +34,7 @@ Cel mai simplu: rularea [single\_file/main.cpp](https://github.com/AlexandruIca/
 cu orice compilator de C++ care suporta C++17(fisierele .txt trebuie sa fie si
 ele incluse unde se creaza executabilul).
 
+Mai complicat:
 ```sh
 cmake -Bbuild -DCMAKE_BUILD_TYPE=Release .
 cd build
@@ -41,6 +42,8 @@ cmake --build .
 cd src/
 ./Sortari
 ```
+
+PS: am testat doar pe linux.
 
 ## Demo
 
