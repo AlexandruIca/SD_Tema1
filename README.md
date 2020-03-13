@@ -30,7 +30,7 @@ rezultate aranjate in tabele.
 
 ## Rulare
 
-Cel mai simplu: rularea [src/single\_file/main.cpp](https://github.com/AlexandruIca/SD_Tema1/blol/master/single_file/main.cpp)
+Cel mai simplu: rularea [single\_file/main.cpp](https://github.com/AlexandruIca/SD_Tema1/blob/master/single_file/main.cpp)
 cu orice compilator de C++ care suporta C++17(fisierele .txt trebuie sa fie si
 ele incluse unde se creaza executabilul).
 
