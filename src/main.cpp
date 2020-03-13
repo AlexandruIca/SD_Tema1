@@ -149,3 +149,63 @@ NEW_SORT("MergeSort", input, output)
     std::vector<int> buf = input;
     merge_sort(buf, output, 0, input.size() - 1);
 }
+
+auto median_of_three(std::vector<int>& v, int const left, int const right)
+    -> int
+{
+    int const mid = left + (right - left) / 2;
+
+    if(v[right] < v[left]) {
+        std::swap(v[right], v[left]);
+    }
+    if(v[mid] < v[left]) {
+        std::swap(v[mid], v[left]);
+    }
+    if(v[right] < v[mid]) {
+        std::swap(v[right], v[mid]);
+    }
+
+    return mid;
+}
+
+auto quicksort(std::vector<int>& v, int const left, int const right) -> void
+{
+    if(right - left <= 0) {
+        return;
+    }
+    if(right - left == 1) {
+        if(v[right] < v[left]) {
+            return std::swap(v[right], v[left]);
+        }
+        return;
+    }
+
+    int i{ left };
+    int j{ right };
+    int pivot = v[median_of_three(v, left, right)];
+
+    while(i <= j) {
+        while(v[i] < pivot) {
+            ++i;
+        }
+        while(v[j] > pivot) {
+            --j;
+        }
+
+        if(i <= j) {
+            std::swap(v[i++], v[j--]);
+        }
+    }
+
+    if(j > left) {
+        quicksort(v, left, j);
+    }
+    else {
+        quicksort(v, i, right);
+    }
+}
+
+NEW_SORT("QuickSort", input, output)
+{
+    quicksort(output, 0, input.size() - 1);
+}

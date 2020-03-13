@@ -6,7 +6,7 @@
 - [x] InsertionSort
 - [x] RadixSort
 - [x] MergeSort
-- [ ] QuickSort
+- [x] QuickSort
 
 ## Structura
 
