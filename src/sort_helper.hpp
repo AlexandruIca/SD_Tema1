@@ -570,6 +570,7 @@ auto main() noexcept -> int
             std::vector<int> output;
 
             make_generator(type, array_size, biggest_num)->generate(input);
+            output = input;
             test->benchmark(
                 input, output, to_str(type), array_size, biggest_num);
         }
