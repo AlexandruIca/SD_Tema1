@@ -1,4 +1,6 @@
+#include <array>
 #include <cstddef>
+#include <queue>
 
 #include "sort_helper.hpp"
 
@@ -53,4 +55,38 @@ NEW_SORT("InsertionSortSTL", input, output)
     for(auto it = output.begin(); it != output.end(); ++it) {
         std::rotate(std::upper_bound(output.begin(), it, *it), it, it + 1);
     }
+}
+
+template<int Base>
+auto radix_sort(std::vector<int>& v) -> void
+{
+    std::array<std::queue<int>, Base> digits;
+    int max = find_max(v);
+    int pow{ 1 };
+
+    while(max / pow > 0) {
+        for(int const num : v) {
+            digits[(num / pow) % Base].push(num);
+        }
+
+        pow *= Base;
+        v.clear();
+
+        for(int i = 0; i < Base; ++i) {
+            while(!digits[i].empty()) {
+                v.push_back(digits[i].front());
+                digits[i].pop();
+            }
+        }
+    }
+}
+
+NEW_SORT("RadixSort10", input, output)
+{
+    radix_sort<10>(output);
+}
+
+NEW_SORT("RadixSort2", input, output)
+{
+    radix_sort<2>(output);
 }

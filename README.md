@@ -4,7 +4,7 @@
 - [x] CountSort
 - [x] BubbleSort
 - [x] InsertionSort
-- [ ] RadixSort
+- [x] RadixSort
 - [ ] MergeSort
 - [ ] QuickSort
 
