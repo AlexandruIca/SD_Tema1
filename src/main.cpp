@@ -201,7 +201,7 @@ auto quicksort(std::vector<int>& v, int const left, int const right) -> void
     if(j > left) {
         quicksort(v, left, j);
     }
-    else {
+    if(i < right) {
         quicksort(v, i, right);
     }
 }
@@ -237,11 +237,11 @@ auto quicksortSTL(InputIt first, InputIt last) -> void
         return;
     }
 
-    auto pivot = *median_of_threeSTL(first, last);
+    auto pivot = *median_of_threeSTL(first, last - 1);
     InputIt middle1 = std::partition(
-        first, last, [pivot](int const& elem) { return elem < pivot; });
+        first, last, [pivot](auto const& elem) { return elem < pivot; });
     InputIt middle2 = std::partition(
-        middle1, last, [pivot](int const& elem) { return !(pivot < elem); });
+        middle1, last, [pivot](auto const& elem) { return !(pivot < elem); });
     quicksortSTL(first, middle1);
     quicksortSTL(middle2, last);
 }
